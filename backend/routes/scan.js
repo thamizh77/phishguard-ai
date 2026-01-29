@@ -12,10 +12,11 @@ router.post('/scan', async (req, res) => {
       return res.status(400).json({ error: 'URL is required' });
     }
 
-    // Call Flask API
-    const flaskResponse = await axios.post('http://127.0.0.1:5000/predict', {
-      url: url
-    });
+    // ✅ USE ENV VARIABLE (IMPORTANT)
+    const flaskResponse = await axios.post(
+      process.env.AI_API_URL,
+      { url }
+    );
 
     const { result, confidence } = flaskResponse.data;
 
@@ -28,16 +29,12 @@ router.post('/scan', async (req, res) => {
 
     await scan.save();
 
-    // Return result
-    res.json({
-      result,
-      confidence
-    });
+    res.json({ result, confidence });
+
   } catch (error) {
-    console.error('Scan error:', error);
-    res.status(500).json({ 
-      error: 'Failed to scan URL',
-      message: error.message 
+    console.error('Scan error:', error.message);
+    res.status(500).json({
+      error: 'Failed to scan URL'
     });
   }
 });
