@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-[#0b0f1a] text-gray-200;
+  }
+
+  body {
+    @apply min-h-screen font-sans antialiased;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl;
+  }
+
+  .input-box {
+    @apply w-full bg-transparent border border-white/20 rounded-lg px-4 py-3
+    text-gray-100 placeholder-gray-400
+    focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400
+    transition;
+  }
+
+  .primary-btn {
+    @apply bg-cyan-500 text-black font-semibold px-6 py-3 rounded-lg
+    hover:bg-cyan-400
+    hover:shadow-[0_0_25px_rgba(34,211,238,0.6)]
+    transition-all duration-300 disabled:opacity-50;
+  }
+
+  .safe {
+    @apply text-green-400;
+  }
+
+  .phishing {
+    @apply text-red-400;
+  }
+}

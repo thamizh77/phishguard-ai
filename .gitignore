@@ -1,0 +1,15 @@
+# OS
+.DS_Store
+
+# env files
+.env
+
+# node
+node_modules/
+
+# python
+venv/
+__pycache__/
+
+# build
+dist/
