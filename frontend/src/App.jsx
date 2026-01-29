@@ -15,7 +15,10 @@ export default function App() {
     setResult(null);
 
     try {
-      const res = await axios.post("http://localhost:4000/api/scan", { url });
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/scan`,
+        { url }
+      );      
       setResult(res.data);
     } catch (err) {
       setError("Scan failed. Backend not reachable.");
