@@ -12,10 +12,13 @@ router.post('/scan', async (req, res) => {
       return res.status(400).json({ error: 'URL is required' });
     }
 
-    // ✅ USE ENV VARIABLE (IMPORTANT)
+    // 🔥 IMPORTANT: timeout added for Render cold start
     const flaskResponse = await axios.post(
       process.env.AI_API_URL,
-      { url }
+      { url },
+      {
+        timeout: 60000 // 60 seconds
+      }
     );
 
     const { result, confidence } = flaskResponse.data;
@@ -32,7 +35,12 @@ router.post('/scan', async (req, res) => {
     res.json({ result, confidence });
 
   } catch (error) {
-    console.error('Scan error:', error.message);
+    // 🔥 Better error logs
+    console.error(
+      'Scan error:',
+      error.response?.data || error.message
+    );
+
     res.status(500).json({
       error: 'Failed to scan URL'
     });
