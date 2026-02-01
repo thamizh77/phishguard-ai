@@ -8,6 +8,11 @@ import numpy as np
 app = Flask(__name__)
 CORS(app)
 
+# 🔥 HEALTH CHECK (VERY IMPORTANT FOR RENDER)
+@app.route("/", methods=["GET"])
+def health():
+    return jsonify({"status": "AI service alive"})
+
 # Load model & scaler
 model = joblib.load("phishing_model.pkl")
 scaler = joblib.load("scaler.pkl")
@@ -22,8 +27,6 @@ def predict():
 
     features = extract_features(url)
     features = np.array(features).reshape(1, -1)
-
-    # 🔥 SCALE BEFORE PREDICT
     features = scaler.transform(features)
 
     prediction = model.predict(features)[0]
