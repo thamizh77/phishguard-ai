@@ -8,22 +8,26 @@ router.post('/scan', async (req, res) => {
   try {
     const { url } = req.body;
 
-    if (!url) {
-      return res.status(400).json({ error: 'URL is required' });
+    // 1️⃣ Validate input
+    if (!url || typeof url !== 'string') {
+      return res.status(400).json({ error: 'Valid URL is required' });
     }
 
-    // 🔥 IMPORTANT: timeout added for Render cold start
+    // 2️⃣ Call AI service (Render-safe)
     const flaskResponse = await axios.post(
       process.env.AI_API_URL,
       { url },
       {
-        timeout: 60000 // 60 seconds
+        timeout: 60000, // 60s for Render cold start
+        headers: {
+          'Content-Type': 'application/json'
+        }
       }
     );
 
     const { result, confidence } = flaskResponse.data;
 
-    // Save to MongoDB
+    // 3️⃣ Save scan result to MongoDB
     const scan = new Scan({
       url,
       result,
@@ -32,17 +36,28 @@ router.post('/scan', async (req, res) => {
 
     await scan.save();
 
-    res.json({ result, confidence });
+    // 4️⃣ Send response to frontend
+    res.status(200).json({
+      result,
+      confidence
+    });
 
   } catch (error) {
-    // 🔥 Better error logs
-    console.error(
-      'Scan error:',
-      error.response?.data || error.message
-    );
+    // 🔥 Proper production logs (VERY IMPORTANT)
+    if (error.code === 'ECONNABORTED') {
+      console.error('⏱️ AI service timeout (cold start)');
+    } else if (error.response) {
+      console.error(
+        '❌ AI service error:',
+        error.response.status,
+        error.response.data
+      );
+    } else {
+      console.error('❌ Scan failed:', error.message);
+    }
 
     res.status(500).json({
-      error: 'Failed to scan URL'
+      error: 'AI service unavailable. Please try again.'
     });
   }
 });

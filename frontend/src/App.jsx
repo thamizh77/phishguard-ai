@@ -21,7 +21,7 @@ export default function App() {
       );      
       setResult(res.data);
     } catch (err) {
-      setError("Scan failed. Backend not reachable.");
+      setError("AI service waking up. Please try again in 10 seconds.");
     } finally {
       setLoading(false);
     }

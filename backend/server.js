@@ -25,7 +25,10 @@ app.get('/health', (req, res) => {
 });
 
 // 🔥 Render-safe port binding
-const PORT = Number(process.env.PORT);
+const PORT = Number(process.env.PORT) || 4000;
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
+
