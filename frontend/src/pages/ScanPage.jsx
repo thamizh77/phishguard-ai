@@ -7,8 +7,25 @@ export default function ScanPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // 🔹 Save scan result to localStorage (for Dashboard & Reports)
+  const saveScanToLocal = (url, data) => {
+    const scans = JSON.parse(localStorage.getItem('scans')) || [];
+
+    scans.push({
+      url,
+      result: data.result,          // SAFE / PHISHING
+      confidence: data.confidence,  // %
+      scannedAt: new Date().toISOString()
+    });
+
+    localStorage.setItem('scans', JSON.stringify(scans));
+  };
+
   const handleScan = async () => {
-    if (!url.trim()) return setError('Please enter a URL');
+    if (!url.trim()) {
+      setError('Please enter a URL');
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -19,7 +36,10 @@ export default function ScanPage() {
         `${import.meta.env.VITE_API_BASE_URL}/api/scan`,
         { url }
       );
+
       setResult(res.data);
+      saveScanToLocal(url, res.data); // 🔥 IMPORTANT LINE
+
     } catch (err) {
       setError('Scan failed. Backend not reachable.');
     } finally {
@@ -52,26 +72,37 @@ export default function ScanPage() {
         </button>
       </div>
 
-      {error && <p className="mt-4 text-red-400 text-sm">{error}</p>}
+      {error && (
+        <p className="mt-4 text-red-400 text-sm">
+          {error}
+        </p>
+      )}
 
       {result && (
         <div className="mt-8 p-6 rounded-xl bg-black/40 border border-white/10">
           <p
             className={`text-2xl font-bold ${
-              result.result === 'PHISHING' ? 'phishing' : 'safe'
+              result.result === 'PHISHING'
+                ? 'text-red-500'
+                : 'text-green-400'
             }`}
           >
             {result.result}
           </p>
 
           <p className="text-sm text-gray-400 mt-2">
-            Confidence: <span className="text-white">{result.confidence}%</span>
+            Confidence:{' '}
+            <span className="text-white">
+              {result.confidence}%
+            </span>
           </p>
 
           <div className="mt-3 h-2 bg-white/10 rounded">
             <div
               className={`h-2 rounded ${
-                result.result === 'PHISHING' ? 'bg-red-500' : 'bg-green-500'
+                result.result === 'PHISHING'
+                  ? 'bg-red-500'
+                  : 'bg-green-500'
               }`}
               style={{ width: `${result.confidence}%` }}
             />
