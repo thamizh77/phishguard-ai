@@ -7,7 +7,7 @@ export default function DashboardPage() {
     safeUrls: 0
   });
 
-  useEffect(() => {
+  const updateStats = () => {
     const scans = JSON.parse(localStorage.getItem("scans")) || [];
 
     const totalScans = scans.length;
@@ -23,6 +23,28 @@ export default function DashboardPage() {
       phishingDetected,
       safeUrls
     });
+  };
+
+  useEffect(() => {
+    updateStats();
+
+    const handleScanSaved = () => {
+      updateStats();
+    };
+
+    const handleStorageChange = (e) => {
+      if (e.key === 'scans' || !e.key) {
+        updateStats();
+      }
+    };
+
+    window.addEventListener('scanSaved', handleScanSaved);
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('scanSaved', handleScanSaved);
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   return (

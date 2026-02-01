@@ -7,18 +7,24 @@ export default function ScanPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // 🔹 Save scan result to localStorage (for Dashboard & Reports)
   const saveScanToLocal = (url, data) => {
     const scans = JSON.parse(localStorage.getItem('scans')) || [];
 
-    scans.push({
+    const newScan = {
       url,
-      result: data.result,          // SAFE / PHISHING
-      confidence: data.confidence,  // %
+      result: data.result,
+      confidence: data.confidence,
       scannedAt: new Date().toISOString()
-    });
+    };
 
+    scans.push(newScan);
     localStorage.setItem('scans', JSON.stringify(scans));
+
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new CustomEvent('scanSaved', { detail: newScan }));
+    
+    // Also trigger storage event for cross-tab sync
+    window.dispatchEvent(new Event('storage'));
   };
 
   const handleScan = async () => {

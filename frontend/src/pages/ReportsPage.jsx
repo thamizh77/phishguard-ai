@@ -4,9 +4,31 @@ export default function ReportsPage() {
   const [scans, setScans] = useState([]);
   const [filter, setFilter] = useState('all');
 
-  useEffect(() => {
+  const loadScans = () => {
     const storedScans = JSON.parse(localStorage.getItem('scans')) || [];
-    setScans(storedScans.reverse()); // latest first
+    setScans(storedScans.reverse());
+  };
+
+  useEffect(() => {
+    loadScans();
+
+    const handleScanSaved = () => {
+      loadScans();
+    };
+
+    const handleStorageChange = (e) => {
+      if (e.key === 'scans' || !e.key) {
+        loadScans();
+      }
+    };
+
+    window.addEventListener('scanSaved', handleScanSaved);
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('scanSaved', handleScanSaved);
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   const filteredScans = scans.filter(scan => {
@@ -16,8 +38,14 @@ export default function ReportsPage() {
     return true;
   });
 
-  const formatDate = (date) =>
-    new Date(date).toLocaleString();
+  const formatDate = (date) => {
+    if (!date) return 'N/A';
+    try {
+      return new Date(date).toLocaleString();
+    } catch {
+      return 'N/A';
+    }
+  };
 
   return (
     <div>
