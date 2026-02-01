@@ -10,7 +10,6 @@ import ReportsPage from './pages/ReportsPage';
 function AppRoutes() {
   const { user, loading } = useAuth();
 
-<<<<<<< HEAD
   const handleScan = async () => {
     if (!url.trim()) return setError("Please enter a URL");
 
@@ -30,15 +29,6 @@ function AppRoutes() {
       setLoading(false);
     }
   };
-=======
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="text-white">Loading...</div>
-      </div>
-    );
-  }
->>>>>>> 88b0242 (Added Firebase auth, dashboard, reports and routing)
 
   return (
     <Routes>
